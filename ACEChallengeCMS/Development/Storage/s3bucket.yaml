@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CloudFormation template to create an S3 bucket
+
+Parameters:
+  BucketName:
+    Type: String
+    Description: The name of the S3 bucket
+    AllowedPattern: "^[a-z0-9.-]{3,63}$" # Will only allow lowercase letters, numbers, dots, and dashes, and will require name to be 3-63 characters
+    ConstraintDescription: Must be between 3 and 63 characters, lowercase, with only letters, numbers, dots, and hyphens.
+
+  EnableVersioning:
+    Type: String
+    Description: Enable versioning for the S3 bucket
+    Default: "true"
+    AllowedValues:
+      - "true"
+      - "false"
+
+  EnableEncryption:
+    Type: String
+    Description: Enable server-side encryption for the S3 bucket
+    Default: "true"
+    AllowedValues:
+      - "true"
+      - "false"
+
+  # Will move the noncurrent version of the template to Glacier for cost saving purposes.
+  LifecyclePolicyDays:
+    Type: Number
+    Description: Number of days to retain noncurrent versions before transitioning them to Glacier
+    Default: 30
+    MinValue: 1
+
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+      VersioningConfiguration: # If versioning parameter is set to true the status will be set to enabled; suspended if false.
+        Status: !If [EnableVersioningIsTrue, "Enabled", "Suspended"]
+      BucketEncryption:
+        Fn::If:
+          - EnableEncryptionIsTrue # If encryption is set to true
+          - ServerSideEncryptionConfiguration: # Then configure encryption to use AES-256
+              - ServerSideEncryptionByDefault:
+                  SSEAlgorithm: AES256
+          - !Ref "AWS::NoValue" # Else ignore this property completely
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: "MoveToGlacier"
+            Status: Enabled
+            NoncurrentVersionTransitions:
+              - TransitionInDays: !Ref LifecyclePolicyDays
+                StorageClass: GLACIER
+
+Conditions:
+  EnableVersioningIsTrue: !Equals [!Ref EnableVersioning, "true"]
+  EnableEncryptionIsTrue: !Equals [!Ref EnableEncryption, "true"]
+
+Outputs:
+  BucketName:
+    Description: Name of the created S3 bucket
+    Value: !Ref S3Bucket
+  BucketArn:
+    Description: ARN of the created S3 bucket
+    Value: !GetAtt S3Bucket.Arn
