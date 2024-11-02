@@ -1,0 +1,91 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Template to create an EC2 instance in a specified VPC and subnet.
+
+Parameters:
+  Env:
+    Type: String
+    Description: Environment name (e.g., dev, test, prod)
+    Default: dev
+    AllowedPattern: "^[a-zA-Z0-9-]+$"
+
+  InstanceType:
+    Type: String
+    Description: EC2 Instance type
+    Default: t2.micro
+
+  PublicSubnetId:
+    Type: AWS::EC2::Subnet::Id
+    Description: The ID of the public subnet for the EC2 instance.
+
+  LatestAmiId:
+    Type: "AWS::SSM::Parameter::Value<String>"
+    Default: "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2"
+    Description: Parameter store path for the latest Amazon Linux 2 AMI.
+
+  KeyName:
+    Type: String
+    Default: scouto_mentor_task_kp_pem
+    Description: The name of the key pair to associate with the instance.
+
+  EC2InstanceProfile:
+    Type: String
+    Description: The name of the EC2 instance profile for EC2.
+
+  VPC:
+    Type: String
+    Description: The name of the VPC for the Security Group.
+
+Resources:
+  EC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Allow HTTP and HTTPS traffic"
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: "0.0.0.0/0"
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: "0.0.0.0/0"
+      Tags:
+        - Key: Name
+          Value: "devops-msc-sg"
+        - Key: Environment
+          Value: !Ref Env
+
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      SubnetId: !Ref PublicSubnetId
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      ImageId: !Ref LatestAmiId
+      KeyName: !Ref KeyName
+      SecurityGroupIds:
+        - !Ref EC2SecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${Env}-devops-msc"
+        - Key: Environment
+          Value: !Ref Env
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum update -y
+          yum install httpd -y
+          sudo systemctl start httpd
+          sudo systemctl enable httpd
+          cd /var/www/html
+          echo "<html><body><h1 style='color:#007777;'>Stephanie's DevOps Milestone Challenge</h1></body></html>" > index.html
+
+Outputs:
+  EC2InstanceId:
+    Description: The ID of the EC2 instance
+    Value: !Ref EC2Instance
+
+  PublicDNS:
+    Description: Public DNS of the EC2 instance
+    Value: !GetAtt EC2Instance.PublicDnsName

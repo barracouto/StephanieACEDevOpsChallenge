@@ -1,0 +1,135 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: IAM Role that CloudFormation can assume to access S3 for nested stack templates.
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    Description: Environment name (e.g., dev, prod, test)
+    AllowedPattern: "^[a-zA-Z0-9-]+$"
+
+  S3BucketName:
+    Type: String
+    Description: The name of the S3 bucket containing CloudFormation templates for nested stacks.
+
+  CodePipelineS3BucketName:
+    Type: String
+    Description: The name of the S3 bucket where CodePipeline holds the DevOps Challenge repository.
+
+Resources:
+  CloudFormationExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${Environment}-DevOps-Challenge-CloudFormation-Execution-Role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudformation.amazonaws.com
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: !Sub "${Environment}-DevOps-Challenge-CloudFormation-S3-Access"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              # S3 permissions for accessing templates
+              - Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                  - "s3:ListBucket"
+                Resource:
+                  - !Sub "arn:aws:s3:::${S3BucketName}"
+                  - !Sub "arn:aws:s3:::${S3BucketName}/*"
+                  - !Sub "arn:aws:s3:::${CodePipelineS3BucketName}"
+                  - !Sub "arn:aws:s3:::${CodePipelineS3BucketName}/*"
+              # CloudFormation permissions for managing stacks
+              - Effect: Allow
+                Action:
+                  - "cloudformation:CreateStack"
+                  - "cloudformation:DescribeStacks"
+                  - "cloudformation:DeleteStack"
+                  - "cloudformation:UpdateStack"
+                Resource: "*"
+              # Permissions for EC2 and VPC resources
+              - Effect: Allow
+                Action:
+                  - ec2:CreateTags
+                  - ec2:ModifySubnetAttribute
+                  - ec2:ModifyVpcAttribute
+                  - ec2:CreateVpc
+                  - ec2:DeleteVpc
+                  - ec2:CreateInternetGateway
+                  - ec2:DeleteInternetGateway
+                  - ec2:AttachInternetGateway
+                  - ec2:DetachInternetGateway
+                  - ec2:CreateSubnet
+                  - ec2:DeleteSubnet
+                  - ec2:CreateRouteTable
+                  - ec2:DeleteRouteTable
+                  - ec2:CreateRoute
+                  - ec2:ReplaceRoute
+                  - ec2:DeleteRoute
+                  - ec2:AssociateRouteTable
+                  - ec2:DisassociateRouteTable
+                  - ec2:CreateNatGateway
+                  - ec2:DeleteNatGateway
+                  - ec2:DescribeNatGateways
+                  - ec2:DescribeVpcs
+                  - ec2:DescribeSubnets
+                  - ec2:DescribeRouteTables
+                  - ec2:DescribeInternetGateways
+                  - ec2:DescribeSecurityGroups
+                  - ec2:CreateSecurityGroup
+                  - ec2:DeleteSecurityGroup
+                  - ec2:AuthorizeSecurityGroupIngress
+                  - ec2:RevokeSecurityGroupIngress
+                  - ec2:DescribeInstances
+                  - ec2:RunInstances
+                  - ec2:TerminateInstances
+                  - ec2:DescribeImages
+                  - ec2:DescribeInstanceStatus
+                  - ec2:DescribeKeyPairs
+                Resource: "*"
+              # IAM permissions for role and instance profile management
+              - Effect: Allow
+                Action:
+                  - iam:CreateRole
+                  - iam:DeleteRole
+                  - iam:AttachRolePolicy
+                  - iam:DetachRolePolicy
+                  - iam:CreateInstanceProfile
+                  - iam:AddRoleToInstanceProfile
+                  - iam:RemoveRoleFromInstanceProfile
+                  - iam:DeleteInstanceProfile
+                  - iam:PassRole
+                  - iam:GetRole
+                  - iam:TagRole
+                  - iam:PutRolePolicy
+                  - iam:DeleteRolePolicy
+                  - iam:GetInstanceProfile
+                  - iam:GetRolePolicy
+                Resource: "*"
+              # SSM permissions for instance management
+              - Effect: Allow
+                Action:
+                  - ssm:DescribeInstanceInformation
+                  - ssm:SendCommand
+                  - ssm:GetCommandInvocation
+                  - ssm:ListCommandInvocations
+                  - ssm:PutParameter
+                  - ssm:GetParameters
+                  - ssm:GetParameter
+                  - ssm:ListTagsForResource
+                  - ec2messages:GetMessages
+                  - ec2messages:AcknowledgeMessage
+                  - ec2messages:SendReply
+                Resource: "*"
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+
+Outputs:
+  RoleArn:
+    Description: The ARN of the IAM Role for CloudFormation
+    Value: !GetAtt CloudFormationExecutionRole.Arn

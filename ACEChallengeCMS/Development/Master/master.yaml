@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Master template to create VPC and EC2 nested stacks.
+
+Parameters:
+  Env:
+    Type: String
+    Description: Environment name (e.g., dev, test, prod)
+    Default: dev
+    AllowedPattern: "^[a-zA-Z0-9-]+$"
+
+Resources:
+  VPCStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: "https://scouto-ace-devops-msc.s3.us-east-1.amazonaws.com/networking/vpc.yaml"
+      Parameters:
+        Env: !Ref Env
+
+  EC2Stack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: "https://scouto-ace-devops-msc.s3.us-east-1.amazonaws.com/compute/ec2.yaml"
+      Parameters:
+        Env: !Ref Env
+        PublicSubnetId: !GetAtt VPCStack.Outputs.PublicSubnetId
+        VPC: !GetAtt VPCStack.Outputs.VPCId
+        EC2InstanceProfile: !GetAtt IAMStack.Outputs.InstanceProfileName
+
+  IAMStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: "https://scouto-ace-devops-msc.s3.us-east-1.amazonaws.com/iam/instancerole.yaml"
+      Parameters:
+        Env: !Ref Env

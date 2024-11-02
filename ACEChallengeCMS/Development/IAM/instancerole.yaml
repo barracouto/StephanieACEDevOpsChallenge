@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Template to create an IAM Role for EC2 instance access with SSM permissions.
+
+Parameters:
+  Env:
+    Type: String
+    Description: Environment name (e.g., dev, test, prod)
+    Default: dev
+    AllowedPattern: "^[a-zA-Z0-9-]+$"
+
+Resources:
+  EC2InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${Env}-devops-msc-instance-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub "${Env}-ec2-ssm-permissions"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              # Allow SSM for instance management
+              - Effect: Allow
+                Action:
+                  - ssm:DescribeInstanceInformation
+                  - ssm:SendCommand
+                  - ssm:GetCommandInvocation
+                  - ssm:ListCommandInvocations
+                  - ssm:PutParameter
+                  - ssm:GetParameters
+                  - ssm:GetParameter
+                  - ssm:ListTagsForResource
+                  - ec2messages:GetMessages
+                  - ec2messages:AcknowledgeMessage
+                  - ec2messages:SendReply
+                Resource: "*"
+      Tags:
+        - Key: Environment
+          Value: !Ref Env
+
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub "${Env}-devops-msc-instance-profile"
+      Roles:
+        - !Ref EC2InstanceRole
+
+Outputs:
+  InstanceRoleARN:
+    Description: The ARN of the IAM Role
+    Value: !GetAtt EC2InstanceRole.Arn
+
+  InstanceProfileName:
+    Description: The Name of the IAM Instance Profile
+    Value: !Ref EC2InstanceProfile

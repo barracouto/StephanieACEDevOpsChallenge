@@ -71,6 +71,7 @@ Resources:
   NatGateway:
     Type: AWS::EC2::NatGateway
     Properties:
+      ConnectivityType: private
       SubnetId: !Ref PublicSubnet
       Tags:
         - Key: Name
