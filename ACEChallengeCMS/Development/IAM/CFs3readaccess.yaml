@@ -90,6 +90,8 @@ Resources:
                   - ec2:DescribeImages
                   - ec2:DescribeInstanceStatus
                   - ec2:DescribeKeyPairs
+                  - ec2:DeleteTags
+                  - ec2:CreateTags
                 Resource: "*"
               # IAM permissions for role and instance profile management
               - Effect: Allow
