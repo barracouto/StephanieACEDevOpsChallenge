@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: IAM Role for the GitHub to S3 Sync Lambda function.
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    Description: Environment name (e.g., dev, test, prod)
+
+  SourceBucketName:
+    Type: String
+    Description: The name of the S3 bucket where CodePipeline stores artifacts.
+
+  DestinationBucketName:
+    Type: String
+    Description: The name of the S3 bucket where files should be uploaded after processing by the Lambda function.
+
+Resources:
+  GithubToS3LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${Environment}-GithubToS3LambdaRole"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: S3CodePipelinePermissions
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              # Permissions for S3 access
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:ListBucket
+                Resource:
+                  - !Sub "arn:aws:s3:::${SourceBucketName}"
+                  - !Sub "arn:aws:s3:::${SourceBucketName}/*"
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                Resource:
+                  - !Sub "arn:aws:s3:::${DestinationBucketName}/*"
+              # Permissions for CodePipeline interaction
+              - Effect: Allow
+                Action:
+                  - codepipeline:PutJobSuccessResult
+                  - codepipeline:PutJobFailureResult
+                Resource: "*"
+
+Outputs:
+  LambdaRoleArn:
+    Description: The ARN of the IAM Role for the GitHub to S3 Lambda function
+    Value: !GetAtt GithubToS3LambdaRole.Arn

@@ -1,0 +1,32 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Master template to deploy IAM Role and Lambda function for GitHub to S3 sync.
+
+# Only define parameters here if you expect input from an external source
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    Description: Environment name (e.g., dev, test, prod)
+
+Resources:
+  # Nested stack for IAM Role
+  LambdaRoleStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: "https://your-s3-bucket.s3.region.amazonaws.com/path/to/github-to-s3-role.yaml"
+      Parameters:
+        Environment: !Ref Environment
+        SourceBucketName: "source-bucket-name"  # Set value here
+        DestinationBucketName: "destination-bucket-name"  # Set value here
+
+  # Nested stack for Lambda function
+  LambdaFunctionStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: "https://your-s3-bucket.s3.region.amazonaws.com/path/to/github-to-s3-lambda.yaml"
+      Parameters:
+        Environment: !Ref Environment
+        DestinationBucketName: "destination-bucket-name"  # Set value here
+        LambdaRoleArn: !GetAtt LambdaRoleStack.Outputs.LambdaRoleArn
+        LambdaCodeBucket: "lambda-code-bucket-name"  # Set value here
+        LambdaCodeKey: "path/to/lambda-code.zip"  # Set value here

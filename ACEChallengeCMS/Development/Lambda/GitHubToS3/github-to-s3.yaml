@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Lambda function for syncing GitHub artifacts from CodePipeline to S3.
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    Description: Environment name (e.g., dev, test, prod)
+
+  DestinationBucketName:
+    Type: String
+    Description: The name of the S3 bucket where files should be uploaded after processing by the Lambda function.
+
+  LambdaRoleArn:
+    Type: String
+    Description: The ARN of the IAM role to be assumed by the Lambda function.
+
+  LambdaCodeBucket:
+    Type: String
+    Description: The S3 bucket where the Lambda code zip file is stored.
+
+  LambdaCodeKey:
+    Type: String
+    Description: The S3 key (path) to the Lambda code zip file in the LambdaCodeBucket.
+
+Resources:
+  GithubToS3SyncLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub "${Environment}-GithubToS3SyncLambda"
+      Handler: "index.lambda_handler"
+      Role: !Ref LambdaRoleArn
+      Code:
+        S3Bucket: !Ref LambdaCodeBucket
+        S3Key: !Ref LambdaCodeKey
+      Runtime: "python3.8"
+      Timeout: 60
+      Environment:
+        Variables:
+          DESTINATION_BUCKET: !Ref DestinationBucketName
+
+  LambdaInvokePermissionForCodePipeline:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref GithubToS3SyncLambdaFunction
+      Action: "lambda:InvokeFunction"
+      Principal: codepipeline.amazonaws.com
+
+Outputs:
+  LambdaFunctionArn:
+    Description: The ARN of the Lambda function for GitHub to S3 sync
+    Value: !GetAtt GithubToS3SyncLambdaFunction.Arn
