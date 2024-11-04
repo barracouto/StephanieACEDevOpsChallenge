@@ -5,7 +5,7 @@ Parameters:
   Env:
     Type: String
     Description: Environment name (e.g., dev, test, prod)
-    Default: dev
+    Default: dev1
     AllowedPattern: "^[a-zA-Z0-9-]+$"
 
 Resources:
