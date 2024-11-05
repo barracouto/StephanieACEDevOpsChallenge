@@ -8,30 +8,33 @@ Parameters:
     Default: dev1
     AllowedPattern: "^[a-zA-Z0-9-]+$"
 
-  VpcTemplateURL:
-    Type: String
-    Description: Github URL of the VPC stack
+  # VpcTemplateURL:
+  #   Type: String
+  #   Description: Github URL of the VPC stack
+  #   Default: https://raw.githubusercontent.com/barracouto/StephanieACEDevOpsChallenge/a56df15648255d855726a7e5028b4723c99bfef0/ACEChallengeCMS/Development/Networking/vpc.yaml
 
-  Ec2TemplateURL:
-    Type: String
-    Description: Github URL of the EC2 stack
+  # Ec2TemplateURL:
+  #   Type: String
+  #   Description: Github URL of the EC2 stack
+  #   Default: https://raw.githubusercontent.com/barracouto/StephanieACEDevOpsChallenge/5540f501c23d69d7ab70601ef8eb7bdf429003b1/ACEChallengeCMS/Development/Compute/ec2.yaml
 
-  IamTemplateURL:
-    Type: String
-    Description: Github URL of the IAM stack    
+  # IamTemplateURL:
+  #   Type: String
+  #   Description: Github URL of the IAM stack
+  #   Default: https://raw.githubusercontent.com/barracouto/StephanieACEDevOpsChallenge/a56df15648255d855726a7e5028b4723c99bfef0/ACEChallengeCMS/Development/IAM/instancerole.yaml
 
 Resources:
   VPCStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Ref VpcTemplateURL
+      TemplateURL: "../Networking/vpc.yaml"
       Parameters:
         Env: !Ref Env
 
   EC2Stack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Ref Ec2TemplateURL
+      TemplateURL: "../Compute/ec2.yaml"
       Parameters:
         Env: !Ref Env
         PublicSubnetId: !GetAtt VPCStack.Outputs.PublicSubnetId
@@ -41,6 +44,6 @@ Resources:
   IAMStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Ref IamTemplateURL
+      TemplateURL: "../IAM/instancerole.yaml"
       Parameters:
         Env: !Ref Env
