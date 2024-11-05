@@ -30,3 +30,7 @@ phases:
           VpcTemplateURL=https://raw.githubusercontent.com/barracouto/StephanieACEDevOpsChallenge/$VPC_SHA/ACEChallengeCMS/Development/Networking/vpc.yaml \
           --region us-east-1 \
           --capabilities CAPABILITY_NAMED_IAM
+          
+      - echo "EC2 Template URL: https://raw.githubusercontent.com/barracouto/StephanieACEDevOpsChallenge/$EC2_SHA/ACEChallengeCMS/Development/Compute/ec2.yaml"
+      - echo "IAM Template URL: https://raw.githubusercontent.com/barracouto/StephanieACEDevOpsChallenge/$IAM_SHA/ACEChallengeCMS/Development/IAM/instancerole.yaml"
+      - echo "VPC Template URL: https://raw.githubusercontent.com/barracouto/StephanieACEDevOpsChallenge/$VPC_SHA/ACEChallengeCMS/Development/Networking/vpc.yaml"    
