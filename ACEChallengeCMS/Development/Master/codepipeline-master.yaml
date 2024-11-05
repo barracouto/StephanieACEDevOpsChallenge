@@ -8,7 +8,7 @@ Parameters:
     Default: dev1
     AllowedPattern: "^[a-zA-Z0-9-]+$"
 
-  VPCTemplateURL:
+  VpcTemplateURL:
     Type: String
     Description: Github URL of the VPC stack
 
