@@ -9,4 +9,4 @@ phases:
       - echo "Deploying Cloudformation master template"
       - echo "Current directory is $(pwd)"
       - echo "Listing options is $(ls)"
-      - aws cloudformation deploy --template-file ACEChallengeCMS/Development/Master/codepipeline-master.yaml --stack-name StephanieACEDevOpsChallenge --role-arn $CLOUDFORMATION_ROLE_ARN --capabilities CAPABILITY_NAMED_IAM --region us-east-1
+      - aws cloudformation deploy --template-file ACEChallengeCMS/Development/Master/codepipeline-master.yaml --stack-name StephanieACEDevOpsChallenge --role-arn $CLOUDFORMATION_ROLE_ARN --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND --region us-east-1
