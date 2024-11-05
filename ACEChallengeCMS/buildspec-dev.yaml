@@ -8,5 +8,5 @@ phases:
       - echo "All files uploaded to S3"
       - echo "Deploying Cloudformation master template"
       - echo "Current directory is $(pwd)"
-      - echo "LIsting options is $(ls)"
-      - aws cloudformation create-stack --template-file ACEChallengeCMS/Development/Master/codepipeline-master.yaml --stack-name StephanieACEDevOpsChallenge --role-arn $CLOUDFORMATION_ROLE_ARN --capabilities CAPABILITY_NAMED_IAM --region us-east-1
+      - echo "Listing options is $(ls)"
+      - aws cloudformation deploy --template-file ACEChallengeCMS/Development/Master/codepipeline-master.yaml --stack-name StephanieACEDevOpsChallenge --role-arn $CLOUDFORMATION_ROLE_ARN --capabilities CAPABILITY_NAMED_IAM --region us-east-1
