@@ -21,7 +21,7 @@ phases:
       - echo "VPC SHA is $VPC_SHA"
 
       - echo "Deploying CloudFormation stack with dynamic SHAs"
-      - aws cloudformation deploy --template-file Development/Master/codepipeline-master.yaml --stack-name StephanieACEDevOpsChallenge --parameter-overrides Ec2TemplateURL=https://raw.githubusercontent.com/barracouto/StephanieACEDevOpsChallenge/$EC2_SHA/ACEChallengeCMS/Development/Compute/ec2.yaml IamTemplateURL=https://raw.githubusercontent.com/barracouto/StephanieACEDevOpsChallenge/$IAM_SHA/ACEChallengeCMS/Development/IAM/instancerole.yaml VpcTemplateURL=https://raw.githubusercontent.com/barracouto/StephanieACEDevOpsChallenge/$VPC_SHA/ACEChallengeCMS/Development/Networking/vpc.yaml --region us-east-1 --capabilities CAPABILITY_NAMED_IAM
+      - aws cloudformation deploy --template-file Development/Master/codepipeline-master.yaml --stack-name StephanieACEDevOpsChallenge --parameter-overrides Ec2TemplateURL=https://raw.githubusercontent.com/barracouto/StephanieACEDevOpsChallenge/$EC2_SHA/ACEChallengeCMS/Development/Compute/ec2.yaml IamTemplateURL=https://raw.githubusercontent.com/barracouto/StephanieACEDevOpsChallenge/$IAM_SHA/ACEChallengeCMS/Development/IAM/instancerole.yaml VpcTemplateURL=https://raw.githubusercontent.com/barracouto/StephanieACEDevOpsChallenge/$VPC_SHA/ACEChallengeCMS/Development/Networking/vpc.yaml --region us-east-1 --capabilities CAPABILITY_NAMED_IAM --role-arn $CLOUDFORMATION_ROLE_ARN
 
       - echo "EC2 Template URL is https://raw.githubusercontent.com/barracouto/StephanieACEDevOpsChallenge/$EC2_SHA/ACEChallengeCMS/Development/Compute/ec2.yaml"
       - echo "IAM Template URL is https://raw.githubusercontent.com/barracouto/StephanieACEDevOpsChallenge/$IAM_SHA/ACEChallengeCMS/Development/IAM/instancerole.yaml"
