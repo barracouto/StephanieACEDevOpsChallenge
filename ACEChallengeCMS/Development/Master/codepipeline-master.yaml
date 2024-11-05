@@ -11,17 +11,17 @@ Parameters:
   VpcTemplateURL:
     Type: String
     Description: Github URL of the VPC stack
-    Default: s3://scouto-ace-devops-msc/ACEChallengeCMS/Development/Networking/vpc.yaml
+    Default: https://scouto-ace-devops-msc.s3.us-east-1.amazonaws.com/ACEChallengeCMS/Development/Networking/vpc.yaml
 
   Ec2TemplateURL:
     Type: String
     Description: Github URL of the EC2 stack
-    Default: s3://scouto-ace-devops-msc/ACEChallengeCMS/Development/Compute/ec2.yaml
+    Default: https://scouto-ace-devops-msc.s3.us-east-1.amazonaws.com/ACEChallengeCMS/Development/Compute/ec2.yaml
 
   IamTemplateURL:
     Type: String
     Description: Github URL of the IAM stack
-    Default: s3://scouto-ace-devops-msc/ACEChallengeCMS/Development/IAM/instancerole.yaml
+    Default: https://scouto-ace-devops-msc.s3.us-east-1.amazonaws.com/ACEChallengeCMS/Development/IAM/instancerole.yaml
 
 Resources:
   VPCStack:
