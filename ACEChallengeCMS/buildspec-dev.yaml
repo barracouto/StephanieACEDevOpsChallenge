@@ -8,11 +8,11 @@ phases:
       - echo "All files uploaded to S3"
       - STACK_NAME="StephanieACEDevOpsChallenge"
       - TEMPLATE_URL="https://scouto-ace-devops-msc.s3.us-east-1.amazonaws.com/ACEChallengeCMS/Development/Master/codepipeline-master.yaml"
-      - echo "Checking if Stacks exists"
-      - if aws cloudformation describe-stacks --stack-name $STACK_NAME; then
-          echo "Stack exists, updating stack...";
-          aws cloudformation update-stack --template-url $TEMPLATE_URL --stack-name $STACK_NAME --role-arn $CLOUDFORMATION_ROLE_ARN --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND --region us-east-1
-        else
-          echo "Stack does not exist, creating stack...";
-          aws cloudformation create-stack --template-url $TEMPLATE_URL --stack-name $STACK_NAME --role-arn $CLOUDFORMATION_ROLE_ARN --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND --region us-east-1
+      - echo "Checking if Stack exists"
+      - if aws cloudformation describe-stacks --stack-name $STACK_NAME; then \
+          echo "Stack exists, updating stack..."; \
+          aws cloudformation update-stack --template-url $TEMPLATE_URL --stack-name $STACK_NAME --role-arn $CLOUDFORMATION_ROLE_ARN --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND --region us-east-1; \
+        else \
+          echo "Stack does not exist, creating stack..."; \
+          aws cloudformation create-stack --template-url $TEMPLATE_URL --stack-name $STACK_NAME --role-arn $CLOUDFORMATION_ROLE_ARN --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND --region us-east-1; \
         fi
