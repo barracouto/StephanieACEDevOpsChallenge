@@ -8,33 +8,33 @@ Parameters:
     Default: dev1
     AllowedPattern: "^[a-zA-Z0-9-]+$"
 
-  # VpcTemplateURL:
-  #   Type: String
-  #   Description: Github URL of the VPC stack
-  #   Default: https://raw.githubusercontent.com/barracouto/StephanieACEDevOpsChallenge/a56df15648255d855726a7e5028b4723c99bfef0/ACEChallengeCMS/Development/Networking/vpc.yaml
+  VpcTemplateURL:
+    Type: String
+    Description: Github URL of the VPC stack
+    Default: s3://scouto-ace-devops-msc/ACEChallengeCMS/Development/Networking/vpc.yaml
 
-  # Ec2TemplateURL:
-  #   Type: String
-  #   Description: Github URL of the EC2 stack
-  #   Default: https://raw.githubusercontent.com/barracouto/StephanieACEDevOpsChallenge/5540f501c23d69d7ab70601ef8eb7bdf429003b1/ACEChallengeCMS/Development/Compute/ec2.yaml
+  Ec2TemplateURL:
+    Type: String
+    Description: Github URL of the EC2 stack
+    Default: s3://scouto-ace-devops-msc/ACEChallengeCMS/Development/Compute/ec2.yaml
 
-  # IamTemplateURL:
-  #   Type: String
-  #   Description: Github URL of the IAM stack
-  #   Default: https://raw.githubusercontent.com/barracouto/StephanieACEDevOpsChallenge/a56df15648255d855726a7e5028b4723c99bfef0/ACEChallengeCMS/Development/IAM/instancerole.yaml
+  IamTemplateURL:
+    Type: String
+    Description: Github URL of the IAM stack
+    Default: s3://scouto-ace-devops-msc/ACEChallengeCMS/Development/IAM/instancerole.yaml
 
 Resources:
   VPCStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: "../Networking/vpc.yaml"
+      TemplateURL: !Ref VpcTemplateURL
       Parameters:
         Env: !Ref Env
 
   EC2Stack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: "../Compute/ec2.yaml"
+      TemplateURL: !Ref Ec2TemplateURL
       Parameters:
         Env: !Ref Env
         PublicSubnetId: !GetAtt VPCStack.Outputs.PublicSubnetId
@@ -44,6 +44,6 @@ Resources:
   IAMStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: "../IAM/instancerole.yaml"
+      TemplateURL: !Ref IamTemplateURL
       Parameters:
         Env: !Ref Env
