@@ -13,7 +13,11 @@ phases:
         if aws cloudformation describe-stacks --stack-name $STACK_NAME; then
           echo "Stack exists, updating stack...";
           aws cloudformation update-stack --template-url $TEMPLATE_URL --stack-name $STACK_NAME --role-arn $CLOUDFORMATION_ROLE_ARN --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND --region us-east-1;
+          echo "Waiting for stack update to complete...";
+          aws cloudformation wait stack-update-complete --stack-name $STACK_NAME --region us-east-1;
         else
           echo "Stack does not exist, creating stack...";
           aws cloudformation create-stack --template-url $TEMPLATE_URL --stack-name $STACK_NAME --role-arn $CLOUDFORMATION_ROLE_ARN --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND --region us-east-1;
+          echo "Waiting for stack creation to complete...";
+          aws cloudformation wait stack-create-complete --stack-name $STACK_NAME --region us-east-1;
         fi
