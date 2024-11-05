@@ -1,29 +1,8 @@
 version: 0.2
 
 phases:
-  install:
-    commands:
-      - echo "Installing Git"
-      - yum install -y git
-      - git clone https://github.com/barracouto/StephanieACEDevOpsChallenge.git repo
-      - cd repo/ACEChallengeCMS
-      - echo "Current directory is $(pwd)"
-
   build:
     commands:
-      - echo "Fetching latest commit SHAs for each template"
-      - EC2_SHA=$(git log -n 1 --pretty=format:%H -- Development/Compute/ec2.yaml)
-      - IAM_SHA=$(git log -n 1 --pretty=format:%H -- Development/IAM/instancerole.yaml)
-      - VPC_SHA=$(git log -n 1 --pretty=format:%H -- Development/Networking/vpc.yaml)
-
-      - echo "EC2 SHA is $EC2_SHA"
-      - echo "IAM SHA is $IAM_SHA"
-      - echo "VPC SHA is $VPC_SHA"
-
-      - echo "EC2 Template URL is https://raw.githubusercontent.com/barracouto/StephanieACEDevOpsChallenge/$EC2_SHA/ACEChallengeCMS/Development/Compute/ec2.yaml"
-      - echo "IAM Template URL is https://raw.githubusercontent.com/barracouto/StephanieACEDevOpsChallenge/$IAM_SHA/ACEChallengeCMS/Development/IAM/instancerole.yaml"
-      - echo "VPC Template URL is https://raw.githubusercontent.com/barracouto/StephanieACEDevOpsChallenge/$VPC_SHA/ACEChallengeCMS/Development/Networking/vpc.yaml"
-
-      - echo "Deploying CloudFormation stack with dynamic SHAs"
-      - aws cloudformation deploy --template-file Development/Master/codepipeline-master.yaml --stack-name StephanieACEDevOpsChallenge --parameter-overrides Ec2TemplateURL=https://raw.githubusercontent.com/barracouto/StephanieACEDevOpsChallenge/$EC2_SHA/ACEChallengeCMS/Development/Compute/ec2.yaml IamTemplateURL=https://raw.githubusercontent.com/barracouto/StephanieACEDevOpsChallenge/$IAM_SHA/ACEChallengeCMS/Development/IAM/instancerole.yaml VpcTemplateURL=https://raw.githubusercontent.com/barracouto/StephanieACEDevOpsChallenge/$VPC_SHA/ACEChallengeCMS/Development/Networking/vpc.yaml --region us-east-1 --capabilities CAPABILITY_NAMED_IAM --role-arn $CLOUDFORMATION_ROLE_ARN --no-fail-on-empty-changeset
-
+      - echo "Copying all files to S3"
+      - aws s3 cp ACEChallengeCMS/Development s3://scouto-ace-devops-msc/ACEChallengeCMS/Development --recursive
+      - echo "All files uploaded to S3"
