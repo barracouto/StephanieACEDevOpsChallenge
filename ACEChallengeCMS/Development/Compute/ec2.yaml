@@ -68,7 +68,7 @@ Resources:
         - !Ref EC2SecurityGroup
       Tags:
         - Key: Name
-          Value: !Sub "${Env}-devops-msc-BuildSpecFileTest"
+          Value: !Sub "${Env}-devops-msc-BuildSpecFileTest2"
         - Key: Environment
           Value: !Ref Env
       UserData:
