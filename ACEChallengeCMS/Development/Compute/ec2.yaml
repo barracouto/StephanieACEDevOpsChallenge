@@ -68,7 +68,7 @@ Resources:
         - !Ref EC2SecurityGroup
       Tags:
         - Key: Name
-          Value: !Sub "${Env}-devops-msc-Gunnar"
+          Value: !Sub "${Env}-devops-msc-Alice"
         - Key: Environment
           Value: !Ref Env
       UserData:
