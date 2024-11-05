@@ -1,0 +1,32 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "Installing Git"
+      - yum install -y git
+
+  build:
+    commands:
+      - echo "Fetching latest commit SHAs for each template"
+
+      # Get the commit SHA for each file
+      - EC2_SHA=$(git log -n 1 --pretty=format:%H -- ACEChallengeCMS/Development/Compute/ec2.yaml)
+      - IAM_SHA=$(git log -n 1 --pretty=format:%H -- ACEChallengeCMS/Development/IAM/instancerole.yaml)
+      - VPC_SHA=$(git log -n 1 --pretty=format:%H -- ACEChallengeCMS/Development/Networking/vpc.yaml)
+
+      - echo "EC2 SHA: $EC2_SHA"
+      - echo "IAM SHA: $IAM_SHA"
+      - echo "VPC SHA: $VPC_SHA"
+
+      # Deploy CloudFormation using these SHAs in the GitHub URLs
+      - echo "Deploying CloudFormation stack with dynamic SHAs"
+      - aws cloudformation deploy \
+        --template-file ACEChallengeCMS/Development/Master/codepipeline-master.yaml \
+        --stack-name StephanieACEDevOpsChallenge \
+        --parameter-overrides \
+        Ec2TemplateURL="https://raw.githubusercontent.com/barracouto/StephanieACEDevOpsChallenge/$EC2_SHA/ACEChallengeCMS/Development/Compute/ec2.yaml" \
+        IamTemplateURL="https://raw.githubusercontent.com/barracouto/StephanieACEDevOpsChallenge/$IAM_SHA/ACEChallengeCMS/Development/IAM/instancerole.yaml" \
+        VpcTemplateURL="https://raw.githubusercontent.com/barracouto/StephanieACEDevOpsChallenge/$VPC_SHA/ACEChallengeCMS/Development/Networking/vpc.yaml" \
+        --region us-east-1 \
+        --capabilities CAPABILITY_NAMED_IAM
